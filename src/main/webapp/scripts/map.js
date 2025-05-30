@@ -11,13 +11,13 @@ let startX, startY;
 let lastX, lastY;
 
 // DOM Elements
-let map;
+let mapElement;
 let mapWrapper;
 let mapImage;
 
 // Initialize map functionality
 function initMap() {
-  map = document.getElementById('map');
+  mapElement = document.getElementById('map');
   mapWrapper = document.getElementById('map-wrapper');
   mapImage = document.getElementById('map-image');
   

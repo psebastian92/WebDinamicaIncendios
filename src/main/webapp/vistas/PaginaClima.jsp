@@ -75,7 +75,6 @@
 				</div>
 				<div id="map-wrapper">
 					<div id="map"></div>
-					<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 					<script>
     const map = L.map('map', {
       center: [-38.4161, -63.6167], // Centro de Argentina
@@ -98,15 +97,15 @@ const datosClimaticos = [
 		double tempGen = d.getTemperaturaGeneral();
 		double tempPelig = d.getTemperaturaPeligrosa();
 		double humedad = d.getHumedadTierra();
-		String aireStr = String.valueOf(d.getAire());
-		String gasesStr = String.valueOf(d.getGases());%>
+		double aireStr = d.getAire();
+		double gasesStr = d.getGases();%>
   {
     fecha: "<%=fechaStr%>",
     temperaturaGeneral: <%=tempGen%>,
     temperaturaPeligrosa: <%=tempPelig%>,
     humedadTierra: <%=humedad%>,
-    aire: "<%=aireStr%>",
-    gases: "<%=gasesStr%>"
+    aire: <%=aireStr%>,
+    gases: <%=gasesStr%>
   }<%=(i < datos.size() - 1) ? "," : ""%>
   <%}
 }%>
@@ -122,13 +121,14 @@ const coordenadasCordoba = [
 
 // Paso 3: Función para asignar color según temperatura peligrosa
 function getColor(valor) {
-  if (valor < 10) return "#00ffff";  // celeste
-  if (valor < 20) return "#00cc44";  // verde
-  if (valor < 30) return "#ffff00";  // amarillo
-  if (valor < 40) return "#ff8000";  // naranja
-  return "#ff0000";                  // rojo
+  const num = Number(valor);
+  if (isNaN(num)) return null; // o algún color por defecto si no es número
+  if (num < 10) return "#00ffff";  // celeste
+  if (num < 20) return "#00cc44";  // verde
+  if (num < 30) return "#ffff00";  // amarillo
+  if (num < 40) return "#ff8000";  // naranja
+  return "#ff0000";  // rojo si es >= 40
 }
-
 // Paso 4: Crear círculos con popups que muestran todos los valores
 const circulos = {};
 // Usamos los últimos 3 datos para los 3 sensores
@@ -136,24 +136,21 @@ const datosMostrar = datosClimaticos.slice(-3);
 
 datosMostrar.forEach((dato, i) => {
   const coord = coordenadasCordoba[i];
-  const color = getColor(dato.temperaturaPeligrosa);
+  const color = getColor(dato.temperaturaGeneral);
 
-  console.log(`Sensor ${i}:`, {
-    coordenadas: coord,
-    dato: dato
-  });
   
-  const popupContent = `
-    <strong>${coord.nombre}</strong><br>
-    Fecha: ${dato.fecha}<br>
-    Temp. General: ${dato.temperaturaGeneral}°C<br>
-    Temp. Peligrosa: ${dato.temperaturaPeligrosa}°C<br>
-    Humedad Tierra: ${dato.humedadTierra}%<br>
-    Aire: ${dato.aire}<br>
-    Gases: ${dato.gases}
-  `;
+	const popupContent =
+		  "<strong>" + coord.nombre + "</strong><br>" +
+		  "Fecha: " + dato.fecha + "<br>" +
+		  "Temp. General: " + dato.temperaturaGeneral + "°C<br>" +
+		  "Temp. Peligrosa: " + dato.temperaturaPeligrosa + "°C<br>" +
+		  "Humedad Tierra: " + dato.humedadTierra + "%<br>" +
+		  "Aire: " + dato.aire + "<br>" +
+		  "Gases: " + dato.gases;
+	;
 
   const circulo = L.circle([coord.lat, coord.lng], {
+	 
     color: color,
     fillColor: color,
     fillOpacity: 0.6,
@@ -208,6 +205,7 @@ datosMostrar.forEach((dato, i) => {
 							<th>Gases</th>
 							<td><%=ultimoDato.getGases()%></td>
 						</tr>
+
 					</table>
 					<%
 					}

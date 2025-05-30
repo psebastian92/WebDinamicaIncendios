@@ -19,7 +19,7 @@ public class LeerDatos extends HttpServlet {
         try (Connection conexion = ConexionBD.obtenerConexion();
         	     Statement statement = conexion.createStatement();
         	     ResultSet rs = statement.executeQuery(
-        	             "SELECT Fecha, Temperatura_general, Temperatura_peligrosa, Humedad_tierra, aire, gases FROM datos")) {
+        	             "SELECT id, Fecha, Temperatura_general, Temperatura_peligrosa, Humedad_tierra, aire, gases FROM datos")) {
 
         	     System.out.println("Conexión exitosa a la base de datos.");
 
